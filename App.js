@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -67,22 +67,62 @@ class Card extends Component {
     }
 }
 
+class Clock extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            seconds: 0,
+        }
+    }
+
+    componentDidMount() {
+        this.timerID = setInterval(
+            () => this.tick(), 1000
+        );
+    }
+
+    tick() {
+        this.setState({
+            seconds: this.state.seconds + 1,
+        })
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+        this.props.parentCallback(this.state.seconds);
+    }
+
+    render() {
+        return(
+            <Text style={{ fontWeight: 'bold', fontSize: 20, alignContent: "flex-end" }}>{this.state.seconds}s</Text>
+        );
+    }
+
+}
+
 export default class App extends Component {
     constructor() {
-        var today = new Date(),
-        date = today.getMonth() + '/' + today.getDate() + '/' + today.getFullYear();
         super();
         this.state = {
-            nameText: "",
-            nounText: "",
-            eventText: "",
-            currentDate: date,
+            showClock: false,
+            lastClockValue: 0,
 
         }
     }
 
+    showClock = () => {
+        this.setState({
+            showClock: !this.state.showClock
+        });
+    }
+
+    getClockValue = (clockValue) => {
+        this.setState({
+            lastClockValue: clockValue,
+        })
+    }
+
     HomeScreen = ({ navigation, route }) => {
-        
         return (
             <View style={styles.container}>
                 <View style={{alignItems: 'center',}}>
@@ -93,7 +133,7 @@ export default class App extends Component {
                 <View style={styles.buttonContainer}>
                     <Button
                         title="Play Card Match"
-                        onPress={() => { navigation.navigate('Card Match') }}
+                        onPress={() => { navigation.navigate('Card Match',) }}
                     />
                 </View>
                 <View style={styles.buttonContainer}>
@@ -109,7 +149,10 @@ export default class App extends Component {
     }
 
     GameScreen = ({ navigation, route }) => {
-
+        let clockDisplay;
+        if (true){
+            clockDisplay = <Clock parentCallback={this.getClockValue} />
+        }
         return (
             <View style={ styles.containerTwo }>
                 <View style={ styles.infoContainer }>
@@ -117,7 +160,7 @@ export default class App extends Component {
                         <Text style={{fontWeight: 'bold', fontSize: 25, alignContent: "flex-end"}}>Pairs: **/8</Text>
                     </View>
                     <View style={styles.timeInfo}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 20, alignContent: "flex-end" }}>Current: xxxx</Text>
+                        <Text style={{ fontWeight: 'bold', fontSize: 20, alignContent: "flex-end" }}>Current: {clockDisplay}</Text>
                         <Text style={{ fontSize: 16, alignContent: "flex-end" }}>Best Time: xxxx</Text>
                     </View>
                 </View>
