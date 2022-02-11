@@ -111,8 +111,42 @@ export default class App extends Component {
     GameScreen = ({ navigation, route }) => {
 
         return (
-            <View>
-                
+            <View style={ styles.containerTwo }>
+                <View style={ styles.infoContainer }>
+                    <View style={styles.matchInfo}>
+                        <Text style={{fontWeight: 'bold', fontSize: 25, alignContent: "flex-end"}}>Pairs: **/8</Text>
+                    </View>
+                    <View style={styles.timeInfo}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 20, alignContent: "flex-end" }}>Current: xxxx</Text>
+                        <Text style={{ fontSize: 16, alignContent: "flex-end" }}>Best Time: xxxx</Text>
+                    </View>
+                </View>
+                <View style={styles.cardContainer}>
+                    <View style={styles.cardRow}>
+                        <Card cardNumber="1" />
+                        <Card cardNumber="2" />
+                        <Card cardNumber="3" />
+                        <Card cardNumber="4" />
+                    </View>
+                    <View style={styles.cardRow}>
+                        <Card cardNumber="5" />
+                        <Card cardNumber="6" />
+                        <Card cardNumber="7" />
+                        <Card cardNumber="8" />
+                    </View>
+                    <View style={styles.cardRow}>
+                        <Card cardNumber="9" />
+                        <Card cardNumber="10" />
+                        <Card cardNumber="11" />
+                        <Card cardNumber="12" />
+                    </View>
+                    <View style={styles.cardRow}>
+                        <Card cardNumber="13" />
+                        <Card cardNumber="14" />
+                        <Card cardNumber="15" />
+                        <Card cardNumber="16" />
+                    </View>
+                </View>
                 
                 <StatusBar style="auto" />
             </View>
@@ -148,6 +182,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     },
+  containerTwo: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   buttonContainer: {
     padding: 10,
     alignItems: 'center',
@@ -155,26 +193,42 @@ const styles = StyleSheet.create({
     },
   cardBack: {
     backgroundColor: "aqua",
-    width: 100,
-    height: 100,
+    width: 75,
+    height: 125,
     margin: 10,
     padding: 20,
     borderRadius: 10,
   },
   cardFace: {
     backgroundColor: "red",
-    width: 100,
-    height: 100,
+    width: 75,
+    height: 125,
     margin: 10,
     padding: 20,
     borderRadius: 10,
   },
   cardContainer: {
-    marginTop: 10,
+      marginTop: 10,
+      marginBottom: 10,
   },
   cardRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-  },
+    },
+    infoContainer: {
+        marginTop: 10,
+        flex: 1,
+        flexDirection: "row",
+    },
+    matchInfo: {
+        width: "50%",
+        
+        padding: 5,
+    },
+    timeInfo: {
+        width: "50%",
+        
+        padding: 5,
+    },
 });
