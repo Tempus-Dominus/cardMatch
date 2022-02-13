@@ -34,6 +34,7 @@ class Card extends Component {
             faceup: false,
             cardImage: null,
             cardNumber: props.cardNumber,
+            cardID: props.cardID,
         }
     }
 
@@ -41,6 +42,7 @@ class Card extends Component {
     flipCard = () => {
         this.setState({
             faceup: !this.state.faceup,
+
         });
     }
 
@@ -61,7 +63,7 @@ class Card extends Component {
                 style={showSide}
                 onPress={this.flipCard}
             >
-                <Text>Card {cardNumber}</Text>
+                <Text style={{fontWeight: 'bold', fontSize: 50,}}>{cardNumber}</Text>
             </TouchableOpacity>
         );
     }
@@ -99,6 +101,8 @@ class Clock extends Component {
     }
 
 }
+
+
 
 export default class App extends Component {
     constructor() {
@@ -149,10 +153,25 @@ export default class App extends Component {
     }
 
     GameScreen = ({ navigation, route }) => {
+        let gameArray = ["1","2","3","4","5","6","7","8","1","2","3","4","5","6","7","8",];
+        let gameArrayLength =  gameArray.length;
+
+        let randomize = (arr, n) =>{
+            for (let i = n-1; i>0; i--){
+                let j = Math.floor(Math.random() * (i+1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        randomize (gameArray, gameArrayLength);
+        
         let clockDisplay;
         if (true){
             clockDisplay = <Clock parentCallback={this.getClockValue} />
         }
+
+        
+
         return (
             <View style={ styles.containerTwo }>
                 <View style={ styles.infoContainer }>
@@ -166,28 +185,28 @@ export default class App extends Component {
                 </View>
                 <View style={styles.cardContainer}>
                     <View style={styles.cardRow}>
-                        <Card cardNumber="1" />
-                        <Card cardNumber="2" />
-                        <Card cardNumber="3" />
-                        <Card cardNumber="4" />
+                        <Card cardNumber={gameArray[0]} cardID="0"/>
+                        <Card cardNumber={gameArray[1]} />
+                        <Card cardNumber={gameArray[2]} />
+                        <Card cardNumber={gameArray[3]} />
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber="5" />
-                        <Card cardNumber="6" />
-                        <Card cardNumber="7" />
-                        <Card cardNumber="8" />
+                        <Card cardNumber={gameArray[4]} />
+                        <Card cardNumber={gameArray[5]} />
+                        <Card cardNumber={gameArray[6]} />
+                        <Card cardNumber={gameArray[7]} />
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber="9" />
-                        <Card cardNumber="10" />
-                        <Card cardNumber="11" />
-                        <Card cardNumber="12" />
+                        <Card cardNumber={gameArray[8]} />
+                        <Card cardNumber={gameArray[9]} />
+                        <Card cardNumber={gameArray[10]} />
+                        <Card cardNumber={gameArray[11]} />
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber="13" />
-                        <Card cardNumber="14" />
-                        <Card cardNumber="15" />
-                        <Card cardNumber="16" />
+                        <Card cardNumber={gameArray[12]} />
+                        <Card cardNumber={gameArray[13]} />
+                        <Card cardNumber={gameArray[14]} />
+                        <Card cardNumber={gameArray[15]} />
                     </View>
                 </View>
                 
@@ -249,6 +268,8 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 20,
     borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
   cardContainer: {
       marginTop: 10,
