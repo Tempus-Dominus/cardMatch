@@ -35,6 +35,7 @@ class Card extends Component {
             cardImage: null,
             cardNumber: props.cardNumber,
             cardID: props.cardID,
+            disableTouch: false,
         }
     }
 
@@ -44,12 +45,16 @@ class Card extends Component {
             faceup: !this.state.faceup,
 
         });
+        this.props.parentCallback(this.props.cardID, this.props.cardNumber, this.props.faceup);
     }
+
+    
 
     render() {
         //conditionally decide what to show on the card
         let showSide;
         let cardNumber;
+        let disableTouch = this.disableTouch;
         if (this.state.faceup) {
             showSide=styles.cardFace;
             cardNumber = this.state.cardNumber;
@@ -62,6 +67,7 @@ class Card extends Component {
             <TouchableOpacity
                 style={showSide}
                 onPress={this.flipCard}
+                disabled={disableTouch}
             >
                 <Text style={{fontWeight: 'bold', fontSize: 50,}}>{cardNumber}</Text>
             </TouchableOpacity>
@@ -110,6 +116,8 @@ export default class App extends Component {
         this.state = {
             showClock: false,
             lastClockValue: 0,
+            firstCard: null,
+            secondCard: null,
 
         }
     }
@@ -124,6 +132,30 @@ export default class App extends Component {
         this.setState({
             lastClockValue: clockValue,
         })
+    }
+
+    clickCard = (cID, cNum, cflip) => {
+        if (!this.state.firstCard){
+            this.setState({
+                firstCard: {gridCard: cID, cardValue: cNum, facePosition: cflip}
+            })
+        } else {
+            this.setState({
+                secondCard: {gridCard: cID, cardValue: cNum, facePosition: cflip}
+            })
+        }
+    }
+
+    componentDidUpdate(){
+        if (this.state.secondCard){
+            if (this.state.firstCard.cardValue === this.state.secondCard.cardValue){
+                alert("Match")
+                
+            } else {
+                
+                
+            }
+        }
     }
 
     HomeScreen = ({ navigation, route }) => {
@@ -170,8 +202,6 @@ export default class App extends Component {
             clockDisplay = <Clock parentCallback={this.getClockValue} />
         }
 
-        
-
         return (
             <View style={ styles.containerTwo }>
                 <View style={ styles.infoContainer }>
@@ -185,28 +215,29 @@ export default class App extends Component {
                 </View>
                 <View style={styles.cardContainer}>
                     <View style={styles.cardRow}>
-                        <Card cardNumber={gameArray[0]} cardID="0"/>
-                        <Card cardNumber={gameArray[1]} />
-                        <Card cardNumber={gameArray[2]} />
-                        <Card cardNumber={gameArray[3]} />
+                        
+                        <Card cardNumber={gameArray[0]}  cardID="0" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[1]}  cardID="1" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[2]}  cardID="2" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[3]}  cardID="3" parentCallback={this.clickCard}/>
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber={gameArray[4]} />
-                        <Card cardNumber={gameArray[5]} />
-                        <Card cardNumber={gameArray[6]} />
-                        <Card cardNumber={gameArray[7]} />
+                        <Card cardNumber={gameArray[4]}  cardID="4" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[5]}  cardID="5" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[6]}  cardID="6" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[7]}  cardID="7" parentCallback={this.clickCard}/>
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber={gameArray[8]} />
-                        <Card cardNumber={gameArray[9]} />
-                        <Card cardNumber={gameArray[10]} />
-                        <Card cardNumber={gameArray[11]} />
+                        <Card cardNumber={gameArray[8]}   cardID="8" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[9]}   cardID="9" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[10]} cardID="10" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[11]} cardID="11" parentCallback={this.clickCard}/>
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber={gameArray[12]} />
-                        <Card cardNumber={gameArray[13]} />
-                        <Card cardNumber={gameArray[14]} />
-                        <Card cardNumber={gameArray[15]} />
+                        <Card cardNumber={gameArray[12]} cardID="12" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[13]} cardID="13" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[14]} cardID="14" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[15]} cardID="15" parentCallback={this.clickCard}/>
                     </View>
                 </View>
                 
