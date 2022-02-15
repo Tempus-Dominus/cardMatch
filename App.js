@@ -32,12 +32,16 @@ class Card extends Component {
         super(props);
         this.state = {
             faceup: false,
+            faceChange: false,
             cardImage: null,
             cardNumber: props.cardNumber,
             cardID: props.cardID,
-            disableTouch: false,
+            dataID: null,
+            disableTouch: props.disableTouch,
         }
     }
+
+    if(faceChange){this.flipCard}
 
     //Onpress event handler for this card
     flipCard = () => {
@@ -49,7 +53,6 @@ class Card extends Component {
     }
 
     
-
     render() {
         //conditionally decide what to show on the card
         let showSide;
@@ -202,6 +205,8 @@ export default class App extends Component {
             clockDisplay = <Clock parentCallback={this.getClockValue} />
         }
 
+        
+
         return (
             <View style={ styles.containerTwo }>
                 <View style={ styles.infoContainer }>
@@ -217,7 +222,7 @@ export default class App extends Component {
                     <View style={styles.cardRow}>
                         
                         <Card cardNumber={gameArray[0]}  cardID="0" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[1]}  cardID="1" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[1]}  cardID="1" parentCallback={this.clickCard}/>  
                         <Card cardNumber={gameArray[2]}  cardID="2" parentCallback={this.clickCard}/>
                         <Card cardNumber={gameArray[3]}  cardID="3" parentCallback={this.clickCard}/>
                     </View>
