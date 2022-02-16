@@ -1,0 +1,351 @@
+import { StatusBar } from 'expo-status-bar';
+import React, { Component } from 'react';
+import { useState } from 'react';
+import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator();
+
+class Card extends Component {
+    constructor(props) {
+        super(props);
+        
+    }
+
+    
+       
+    //Onpress event handler for this card
+    flipCard = () => {
+        this.props.callbackFunction(this.props.cardID);
+        this.props.parentCallback(this.props.cardID, this.props.cardNumber);
+    }
+
+    
+    render() {
+        //conditionally decide what to show on the card
+        let showSide;
+        let cardNumber;
+        let disableTouch = this.disableTouch;
+        if (this.props.facing) {
+            showSide=styles.cardFace;
+            cardNumber = this.props.cardNumber;
+        } else {
+            showSide=styles.cardBack;
+            cardNumber="";
+        }
+
+        return(
+            <TouchableOpacity
+                style={showSide}
+                onPress={this.flipCard}
+                disabled={disableTouch}
+            >
+                <Text style={{fontWeight: 'bold', fontSize: 50,}}>{cardNumber}</Text>
+            </TouchableOpacity>
+        );
+    }
+}
+
+class Clock extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            seconds: 0,
+        }
+    }
+
+    componentDidMount() {
+        this.timerID = setInterval(
+            () => this.tick(), 1000
+        );
+    }
+
+    tick() {
+        this.setState({
+            seconds: this.state.seconds + 1,
+        })
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+        this.props.parentCallback(this.state.seconds);
+    }
+
+    render() {
+        return(
+            <Text style={{ fontWeight: 'bold', fontSize: 20, alignContent: "flex-end" }}>{this.state.seconds}s</Text>
+        );
+    }
+
+}
+
+
+
+export default class App extends Component {
+    constructor() {
+        super();
+        this.state = {
+            showClock: false,
+            lastClockValue: 0,
+            firstCard: null,
+            secondCard: null,
+            faceup: [
+                false, false, false, false,
+                false, false, false, false,
+                false, false, false, false,
+                false, false, false, false,
+            ],
+            gameArray: [
+                "1","2","3","4",
+                "5","6","7","8",
+                "1","2","3","4",
+                "5","6","7","8",
+            ],
+            
+        }
+    }
+
+    showClock = () => {
+        this.setState({
+            showClock: !this.state.showClock
+        });
+    }
+
+    getClockValue = (clockValue) => {
+        this.setState({
+            lastClockValue: clockValue,
+        })
+    }
+
+    clickCard = (cID, cNum, cflip) => {
+        if (!this.state.firstCard){
+            this.setState({
+                firstCard: {gridCard: cID, cardValue: cNum}
+            })
+        } else {
+            this.setState({
+                secondCard: {gridCard: cID, cardValue: cNum}
+            })
+        }
+    }
+
+    onCardClick = (cardId) => {
+		if (!this.state.faceUp[cardId]){
+			let faces = this.state.faceUp;
+			faces[cardId] = !faces[cardId];
+			this.setState({ faceUp: faces });
+		}
+	}
+
+    setCard = (id) => {
+        return(
+            <Card
+                cardNumber={this.state.gameArray[id]}
+                callbackFunction={this.onCardClick}
+                facing={this.state.faceup[id]}
+                cardID={id}
+                parentCallback={this.clickCard}
+            />
+        )
+    }
+
+    noMatch = (cardOne) => {
+        if (cardOne) {
+            let faces = this.state.faceup;
+            let pos1 = this.state.firstCard.gridCard
+            let pos2 = this.state.secondCard.gridCard
+            faces[this.state.firstCard.gridCard] = !faces[this.state.firstCard.gridCard]
+            
+            this.setState({faceup: faces, firstCard: {gridCard: null, cardValue: null}, secondCard: {gridCard: null, cardValue: null}})
+            alert(this.state.faceup[0])
+        }
+    }
+
+    componentDidUpdate(){
+        if (this.state.secondCard){
+            if (this.state.firstCard.cardValue === this.state.secondCard.cardValue){
+                alert("Match")
+                
+            } else {
+                {this.noMatch(this.state.firstCard)}
+                
+                
+                
+            }
+        }
+    }
+
+    
+
+    HomeScreen = ({ navigation, route }) => {
+        return (
+            <View style={styles.container}>
+                <View style={{alignItems: 'center',}}>
+                    <Text style={{fontWeight: 'bold', fontSize: 25, padding: 10}}>Welcome to Card Match</Text>
+                    <Text style={{paddingBottom: 40, paddingLeft: 15, paddingRight: 15,}}>This game is played by selecting 1 of 16 cards and trying to find it's matching pair. Try to do this in the shortest time.</Text>
+                </View>
+                
+                <View style={styles.buttonContainer}>
+                    <Button
+                        title="Play Card Match"
+                        onPress={() => { navigation.navigate('Card Match',) }}
+                    />
+                </View>
+                <View style={styles.buttonContainer}>
+                    <Button
+                        title="Best Times"
+                        onPress={() => {}}
+                    />
+                </View>
+
+                <StatusBar style="auto" />
+            </View>
+        )
+    }
+
+    GameScreen = ({ navigation, route }) => {
+        let gameNumbers = this.state.gameArray;
+        let gameArrayLength =  this.state.gameArray.length;
+
+        let randomize = (arr, n) =>{
+            for (let i = n-1; i>0; i--){
+                let j = Math.floor(Math.random() * (i+1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        randomize (gameNumbers, gameArrayLength);
+        
+        let clockDisplay;
+        if (true){
+            clockDisplay = <Clock parentCallback={this.getClockValue} />
+        }
+
+        let iflip = this.state.faceup
+
+        return (
+            <View style={ styles.containerTwo }>
+                <View style={ styles.infoContainer }>
+                    <View style={styles.matchInfo}>
+                        <Text style={{fontWeight: 'bold', fontSize: 25, alignContent: "flex-end"}}>Pairs: **/8</Text>
+                    </View>
+                    <View style={styles.timeInfo}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 20, alignContent: "flex-end" }}>Current: {clockDisplay}</Text>
+                        <Text style={{ fontSize: 16, alignContent: "flex-end" }}>Best Time: xxxx</Text>
+                    </View>
+                </View>
+                <View style={styles.cardContainer}>
+                    <View style={styles.cardRow}>
+                        
+                        {this.setCard(0)}
+                        {this.setCard(1)}
+                        {this.setCard(2)}
+                        {this.setCard(3)}
+                    </View>
+                    <View style={styles.cardRow}>
+                        {this.setCard(4)}
+                        {this.setCard(5)}
+                        {this.setCard(6)}
+                        {this.setCard(7)}
+                    </View>
+                    <View style={styles.cardRow}>
+                        {this.setCard(8)}
+                        {this.setCard(9)}
+                        {this.setCard(10)}
+                        {this.setCard(11)}
+                    </View>
+                    <View style={styles.cardRow}>
+                        {this.setCard(12)}
+                        {this.setCard(13)}
+                        {this.setCard(14)}
+                        {this.setCard(15)}
+                    </View>
+                </View>
+                
+                <StatusBar style="auto" />
+            </View>
+        )
+    }
+
+    render() {
+        
+        return (
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen
+                        name="Home"
+                        component={this.HomeScreen}
+                        options={{ title: 'Home' }}
+                    />
+
+                    <Stack.Screen
+                        name="Card Match"
+                        component={this.GameScreen}
+                        options={{ title: 'Card Match' }}
+                    />
+                </Stack.Navigator>
+            </NavigationContainer>
+        );
+    }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    },
+  containerTwo: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  buttonContainer: {
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    },
+  cardBack: {
+    backgroundColor: "aqua",
+    width: 75,
+    height: 125,
+    margin: 10,
+    padding: 20,
+    borderRadius: 10,
+  },
+  cardFace: {
+    backgroundColor: "red",
+    width: 75,
+    height: 125,
+    margin: 10,
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardContainer: {
+      marginTop: 10,
+      marginBottom: 10,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    },
+    infoContainer: {
+        marginTop: 10,
+        flex: 1,
+        flexDirection: "row",
+    },
+    matchInfo: {
+        width: "50%",
+        
+        padding: 5,
+    },
+    timeInfo: {
+        width: "50%",
+        
+        padding: 5,
+    },
+});
