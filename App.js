@@ -7,31 +7,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
 
-const MyStack = () => {
-    return (
-        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen
-                    name="Home"
-                    Component={HomeScreen}
-                    options={{ title: 'Home' }}
-                />
-
-                <Stack.Screen
-                    name="Card Match"
-                    Component={CardMatch}
-                    options={{ title: 'Card Match' }}
-                />
-            </Stack.Navigator>
-        </NavigationContainer>
-        )
-}
-
 class Card extends Component {
     constructor(props) {
         super(props);
         this.state = {
             faceup: false,
+            initflip: false,
+            flip: props.flip,
             faceChange: false,
             cardImage: null,
             cardNumber: props.cardNumber,
@@ -41,15 +23,15 @@ class Card extends Component {
         }
     }
 
-    if(faceChange){this.flipCard}
-
+    
+       
     //Onpress event handler for this card
     flipCard = () => {
         this.setState({
             faceup: !this.state.faceup,
 
         });
-        this.props.parentCallback(this.props.cardID, this.props.cardNumber, this.props.faceup);
+        this.props.parentCallback(this.props.cardID, this.props.cardNumber);
     }
 
     
@@ -121,7 +103,13 @@ export default class App extends Component {
             lastClockValue: 0,
             firstCard: null,
             secondCard: null,
-
+            faceup: [
+                false, false, false, false,
+                false, false, false, false,
+                false, false, false, false,
+                false, false, false, false,
+            ],
+            
         }
     }
 
@@ -140,12 +128,24 @@ export default class App extends Component {
     clickCard = (cID, cNum, cflip) => {
         if (!this.state.firstCard){
             this.setState({
-                firstCard: {gridCard: cID, cardValue: cNum, facePosition: cflip}
+                firstCard: {gridCard: cID, cardValue: cNum}
             })
         } else {
             this.setState({
-                secondCard: {gridCard: cID, cardValue: cNum, facePosition: cflip}
+                secondCard: {gridCard: cID, cardValue: cNum}
             })
+        }
+    }
+
+    noMatch = (cardOne) => {
+        if (cardOne) {
+            let faces = this.state.faceup;
+            let pos1 = this.state.firstCard.gridCard
+            let pos2 = this.state.secondCard.gridCard
+            faces[this.state.firstCard.gridCard] = !faces[this.state.firstCard.gridCard]
+            
+            this.setState({faceup: faces, firstCard: {gridCard: null, cardValue: null}, secondCard: {gridCard: null, cardValue: null}})
+            alert(this.state.faceup[0])
         }
     }
 
@@ -155,11 +155,15 @@ export default class App extends Component {
                 alert("Match")
                 
             } else {
+                {this.noMatch(this.state.firstCard)}
+                
                 
                 
             }
         }
     }
+
+    
 
     HomeScreen = ({ navigation, route }) => {
         return (
@@ -205,7 +209,7 @@ export default class App extends Component {
             clockDisplay = <Clock parentCallback={this.getClockValue} />
         }
 
-        
+        let iflip = this.state.faceup
 
         return (
             <View style={ styles.containerTwo }>
@@ -221,28 +225,28 @@ export default class App extends Component {
                 <View style={styles.cardContainer}>
                     <View style={styles.cardRow}>
                         
-                        <Card cardNumber={gameArray[0]}  cardID="0" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[1]}  cardID="1" parentCallback={this.clickCard}/>  
-                        <Card cardNumber={gameArray[2]}  cardID="2" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[3]}  cardID="3" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[0]}  cardID="0" flip={iflip} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[1]}  cardID="1" flip={iflip} parentCallback={this.clickCard}/>  
+                        <Card cardNumber={gameArray[2]}  cardID="2" flip={iflip} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[3]}  cardID="3" flip={iflip} parentCallback={this.clickCard}/>
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber={gameArray[4]}  cardID="4" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[5]}  cardID="5" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[6]}  cardID="6" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[7]}  cardID="7" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[4]}  cardID="4" flip={iflip[4]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[5]}  cardID="5" flip={iflip[5]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[6]}  cardID="6" flip={iflip[6]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[7]}  cardID="7" flip={iflip[7]} parentCallback={this.clickCard}/>
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber={gameArray[8]}   cardID="8" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[9]}   cardID="9" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[10]} cardID="10" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[11]} cardID="11" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[8]}   cardID="8" flip={iflip[8]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[9]}   cardID="9" flip={iflip[9]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[10]} cardID="10" flip={iflip[10]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[11]} cardID="11" flip={iflip[11]} parentCallback={this.clickCard}/>
                     </View>
                     <View style={styles.cardRow}>
-                        <Card cardNumber={gameArray[12]} cardID="12" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[13]} cardID="13" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[14]} cardID="14" parentCallback={this.clickCard}/>
-                        <Card cardNumber={gameArray[15]} cardID="15" parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[12]} cardID="12" flip={iflip[12]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[13]} cardID="13" flip={iflip[13]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[14]} cardID="14" flip={iflip[14]} parentCallback={this.clickCard}/>
+                        <Card cardNumber={gameArray[15]} cardID="15" flip={iflip[15]} parentCallback={this.clickCard}/>
                     </View>
                 </View>
                 
