@@ -92,24 +92,25 @@ export default class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			showClock: false,
-			lastClockValue: 0,
-			bestTime: 0,
-			firstCard: null,
-            secondCard: null,
-			cardPairs: 0,
-			startClick: true,
-			deck: [1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8],
-			faceUp: [
-				false, false, false, false,
-				false, false, false, false,
-				false, false, false, false,
-				false, false, false, false],
-			disable: [
-				false, false, false, false,
-				false, false, false, false,
-				false, false, false, false,
-				false, false, false, false],
+			showClock: false,			//Shows clock
+			lastClockValue: 0,			//Last clock value
+			bestTime: 0,				//Best game time
+			firstCard: null,			//First selected card
+            secondCard: null,			//Second selected card
+			cardPairs: 0,				//Matched cards (pairs)
+			startClick: true,			//Starts timer on card click after app is first loaded
+			deck: [1,1,2,2,3,3,4,4,		//Card deck numbers array
+				   5,5,6,6,7,7,8,8],
+
+			faceUp: [false, false, false, false,	//Face position array
+					 false, false, false, false,
+					 false, false, false, false,
+				 	 false, false, false, false],
+
+			disable: [false, false, false, false,	//Touchable enabled/disabled array
+					  false, false, false, false,
+					  false, false, false, false,
+					  false, false, false, false],
 		};
 	}
 	
@@ -130,12 +131,12 @@ export default class App extends Component {
 		let currentIndex = shuffledDeck.length;
 		let randomize = (arr, n) =>{
             for (let i = n-1; i>0; i--){
-                let j = Math.floor(Math.random() * (i+1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+                let j = Math.floor(Math.random() * (i+1));	//Randomizer
+                [arr[i], arr[j]] = [arr[j], arr[i]];		//Deck position swapping
             }
         }
 
-        randomize (rawDeck, currentIndex);
+        randomize (rawDeck, currentIndex);	//Calls randomization and shuffles deck
 		return shuffledDeck;
 	}
 	
@@ -154,9 +155,11 @@ export default class App extends Component {
 			faces[cardId] = !faces[cardId];
 			this.setState({ faceUp: faces });
 		}
+
+		//Allows the clock to start automatically if the user clicks on a card upon the app's initial startup
 		if (this.state.startClick){
 			if(!this.state.showClock){
-				this.setState({showClock: !this.state.showClock, startClick: false})
+				this.setState({showClock: !this.state.showClock, startClick: false}) //shows clock and disables if statement
 			}
 		}
 	}
@@ -170,9 +173,9 @@ export default class App extends Component {
 	****************************************************************************/
 	onMismatch = () => {
 			let faces = this.state.faceUp;
-			faces[this.state.firstCard.cardId] = !faces[this.state.firstCard.cardId];
-			faces[this.state.secondCard.cardId] = !faces[this.state.secondCard.cardId];
-			this.setState({ faceUp: faces, firstCard: null, secondCard: null });
+			faces[this.state.firstCard.cardId] = !faces[this.state.firstCard.cardId];		//Flips first selected card
+			faces[this.state.secondCard.cardId] = !faces[this.state.secondCard.cardId];		//Flips second selected card
+			this.setState({ faceUp: faces, firstCard: null, secondCard: null });			//Updates face position & empties first and second card variables
 	}
 	
 	/****************************************************************************
@@ -184,12 +187,12 @@ export default class App extends Component {
 	renderCard = (id) => {
 		return(
 			<Card 
-				cardNumber={this.state.deck[id]}
-				callbackFunction={this.onCardClick}
-				facing={this.state.faceUp[id]}
-				cardId={id}
-				parentCallback={this.selCard}
-				disabled={this.state.disable[id]}
+				cardNumber={this.state.deck[id]}			//Card face number
+				callbackFunction={this.onCardClick}			//Card click callBack
+				facing={this.state.faceUp[id]}				//Face position
+				cardId={id}									//Id of card instance
+				parentCallback={this.selCard}				//Passes card ID and cardNumber to selCard function
+				disabled={this.state.disable[id]}			//Disables/enables touchableOpacity function
 			/>
 		);
 	}
@@ -215,9 +218,9 @@ export default class App extends Component {
 			false, false, false, false];
 		let mixedDeck = this.shuffle(this.state.deck);
 		this.setState({
-			deck: mixedDeck,
-			faceUp: deckState,
-			disable: disable,
+			deck: mixedDeck,			//Upates deck with new shuffle
+			faceUp: deckState,			//Places cards back facedown
+			disable: disable,			//Re-enables card clickability
 		});
 		
 	}
@@ -233,25 +236,28 @@ export default class App extends Component {
 	\brief		prevents flipping of matched cards, updates best time on last pair
 	*****************************************************************************/
 	onMatch = () => {
-		let noFlip = this.state.disable;
-		noFlip[this.state.firstCard.cardId] = !noFlip[this.state.firstCard.cardId];
-		noFlip[this.state.secondCard.cardId] = !noFlip[this.state.secondCard.cardId];
+		let noFlip = this.state.disable;		//Disable click array
+		noFlip[this.state.firstCard.cardId] = !noFlip[this.state.firstCard.cardId];			//Disables first selected card click
+		noFlip[this.state.secondCard.cardId] = !noFlip[this.state.secondCard.cardId];		//Disables second selected card click
+
+		//Updates button array, clears card selection one & two, increments cardPairs counter
 		this.setState({ disable: noFlip, firstCard: null, secondCard: null, cardPairs: this.state.cardPairs+=1 });
 		
-
+		//Evaluates current time against best time.
 		if(this.state.cardPairs == 8){
+			//Updates best time on first play, otherwise only updates best time when current time is lesser than the best time.
 			if(this.state.bestTime == 0){
 				this.setState({bestTime: this.state.bestTime=this.state.lastClockValue})
 			} else if(this.state.lastClockValue < this.state.bestTime){
 				this.setState({bestTime: this.state.bestTime=this.state.lastClockValue})
 			}
+
+			//Stops the clock
 			this.setState({
 				showClock: !this.state.showClock
 			});
 			
 		}
-		
-		console.log(this.state.lastClockValue, "LASTclkVALUE");
 	}
 
 	
@@ -265,17 +271,20 @@ export default class App extends Component {
 	\brief		Checks for matching cards
 	*****************************************************************************/
 	checkMatch = () => {
+
+		//Compares match and calls appropriate function based on comparison
 		if (this.state.firstCard.cardValue === this.state.secondCard.cardValue){
-			{this.onMatch()}
+			{this.onMatch()}		//Cards did match
 		} else {
-			setTimeout(() => {this.onMismatch()}, 1000)
+			setTimeout(() => {this.onMismatch()}, 1000)		//Cards did not match
 		}
 	}
 
 
 	/****************************************************************************
 	\function 	selCard
-	\param		cID, CNum
+	\param		cID is the ID of the card that was clicked
+	\param		cNum is the deck number of the card
 	\return		none
 	\post		sets the selected cards
 	\post		calls checkMatch on selection of second card
@@ -283,12 +292,15 @@ export default class App extends Component {
 	*****************************************************************************/
 	selCard = (cID, cNum) => {
         if (!this.state.firstCard){
+
+			//Sets the state of firstCard to that of the first clicked card
             this.setState({
                 firstCard: {cardId: cID, cardValue: cNum}
 			})
 			
         } else if (!this.state.secondCard) {
 			
+			//Sets the state of secondCard to that of the second clicked card
             this.setState({
                 secondCard: {cardId: cID, cardValue: cNum}}, () => { this.checkMatch()
             })
@@ -335,13 +347,12 @@ export default class App extends Component {
 		{this.showClock()}
 		this.setState({cardPairs: 0})
 
+		//Updates the best time upon clicking replay
 		if(this.state.bestTime == 0){
 			this.setState({bestTime: this.state.lastClockValue})
 		} else if(this.state.lastClockValue < this.state.bestTime){
 			this.setState({bestTime: this.state.lastClockValue})
 		}
-
-		console.log(this.state.deck)
 	}
 
 	render() {
